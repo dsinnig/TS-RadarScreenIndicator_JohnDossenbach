@@ -1,0 +1,89 @@
+MultiMarkets Indicators – Risk Disclaimer
+
+By using any portion of Gary Bourque’s MultiMarkets Trading Indicators or any information from his services, you agree to the Terms and Conditions governing the use of the services and products as described in this disclaimer. Our disclaimers, policies and terms are subject to change without notice.
+
+You understand the financial implications and risks of trading stocks, options, futures and Forex. You have sufficient liquid funds to invest.
+
+Under no circumstances, including, but not limited to, negligence, shall Gary Bourque or MultiMarkets Trading be liable for any special or consequential damages that result from the use of or the inability to use, the products, services and information provided by them. Nothing Gary Bourque or MultiMarkets Trading offers or sells should be construed as a recommendation to buy and/or sell any stocks, options, futures, or Forex instrument. You agree that Gary Bourque and MultiMarkets Trading will not responsible for your personal trading results. No representation is being made that any account will or is likely to achieve profits or losses similar to those discussed on this website.
+
+There is significant risk of loss trading stocks, futures, options and Forex.  Trading may not be suitable for everyone and you should carefully consider the risks in light of your financial condition in deciding whether to trade commodity futures and options. Further, You assume the entire cost, lost and/or risk of any trading you choose to undertake. All funds committed should be purely risk capital. You may sustain a total loss of the initial margin funds and any additional funds that you deposit in your account to establish or maintain a position in the commodity futures and options market. You should realize that when trading futures and/or granting/writing options you could lose the full balance of your account. It is also possible to lose more than the initial deposit when trading futures and/or granting/writing options. Under no circumstances, including, but not limited to, negligence, shall this service be liable for any special or consequential damages that result from the use of or the inability to use, the materials provided by this service.
+
+
+
+MultiMarkets Multi-TimeFrame Engine
+
+Requires TradeStation RadarScreen Feature: Provides capability for viewing multiple time frame (Monthly, Weekly, Daily, Intraday) information about the same symbol on one RadarScreen row or one chart. Uses the TradeStation Global Dictionary to collect and broadcast data from a special "engine" RadarScreen indicator which then can be read and display from other RadarScreens or charts. Come with sample indicator so you can start build your own multi time frame indicators today. 
+
+
+The Multi-TimeFrame Engine for TradeStation consists of:
+
+   Four functions: a set/get pair for numbers, and a set/get pair for strings. 
+	
+   A engine (set side) RadarScreen, with multiple row for each symbol set to different time frames.
+
+   The set side version of the indicator, which collects, calculates and sets the data in the global dictionary. 
+
+   Any number of display (get side) RadarScreens and/or charts (depending on the type of indicator), 
+
+   The get side version of the indicator, which gets and displays the data which was stored on the set side. 
+
+The four functions make it very easy to organize your data in the global dictionary and retrieve it from any 
+RadarScreen or chart on the platform. 
+
+Select a unique string for IDStr to identify your indicator's data. 
+This will be used on both the engine (set) and display (get) side.
+You can define several different ID strings in one indicator if needed.  
+
+
+The engine (set) side automatically knows the Symbol, BarType (period) and BarInterval (ticks, minutes) based on the RadarScreen row.
+To set (store) a number on the engine side: 
+		
+   IF SET SIDE
+   {	
+      RC = $MM_MTFSetNum(IDStr, Color);
+   }
+
+!SETTING DATA SHOULD ONLY BE DONE AT LastBarOnChart! 
+
+
+Place your set indicator in a RadarScreen with the time periods you want to track. Keep this in a workspace all its own. The data it generates will be accesible across the platform. 
+
+
+Place your display (get side) indicator in the appropriate RadarScreens or charts. The get side can get on any bar, not just LastBarOnChart. 
+
+The get side automatically knows the symbol based on the RadarScreen row or chart it is in, 
+but you must specify the BarType and BarInterval you want to retrieve. 
+In this case it is getting the monthly data. 
+
+   IF GET SIDE 
+   {
+      Color = $MM_MTFGetNum(IDStr, 4, 0);	
+   }
+
+   Bartype:
+   4 = Monthly 
+   3 = Weekly 
+   2 = Daily 
+   1 = Minute
+   0 = Tick or Volume
+   14 = Seconds
+
+   BarInterval is the number of minutes, seconds, ticks, or volume. Use 0 for monthly, weekly and daily. 
+
+Note that Tradestation has a quirk in that BarType is the same for tick and volume charts. 
+So the MTF will not be able to differentiate if you have both, for example, 
+a 1000-tick row and a 1000-share row on the same symbol.
+
+Set and get string data in the same manner using the string functions: 
+
+   RC   = $MM_MTFSetStr(IDStr, Name); 
+
+   Name = $MM_MTFGetNum(IDStr, 4, 0);	
+
+
+See the $MMSampleGlobals sample indicator and the MM_MTFSample.tsw workspace for more information on how to write an MTF indicator. 
+
+When you receive the MFT indicator package. If the $MMSamplesGlobal Indicator included is protected, that is you can't see the source code, simply delete it and recreate it using the $MMSampleGlobals.eit file. Then you can follow the code in it to learn how to create your own multi-time frame indicators. 
+
+
+Questions? support@multimarketstrading.com or visit www.multimarketstrading.com

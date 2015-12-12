@@ -1,0 +1,103 @@
+//+------------------------------------------------------------------+
+//|                               Knoxville Divergence MT Reader 1.0 |
+//|                                                        D. Sinnig |      
+//|																	 |
+//|																	 |
+//|                                                                  |
+//| v1.0:                                                            |
+//| - Obtains Knoxville Divergence readings from global dictionary   |
+//|   and plots them out to Radarscreen                              |
+//+------------------------------------------------------------------+
+
+Inputs:
+	_D (true),
+	_4h (true),
+	_2h (true),
+	_1h (true),
+	_30m (true),
+	_15m (true),
+	_10m (true),
+	_5m (true),
+	_1m (true);
+	
+Variables: 
+	BarsSinceDiv (0),
+	Color (WHITE);
+
+if _1m then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 1);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 1);
+	Plot1 (BarsSinceDiv, "1M", BLACK, Color);
+end;
+
+if _5m then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 5);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 5);
+	Plot2 (BarsSinceDiv, "5M", BLACK, Color);
+end;
+
+if _10m then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 10);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 10);
+	Plot3 (BarsSinceDiv, "10M", BLACK, Color);
+end;
+
+if _15m then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 15);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 15);
+	Plot4 (BarsSinceDiv, "15M", BLACK, Color);
+end;
+
+if _30m then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 30);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 30);
+	Plot5 (BarsSinceDiv, "30M", BLACK, Color);
+end;
+
+if _1h then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 60);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 60);
+	Plot6 (BarsSinceDiv, "1H", BLACK, Color);
+end;
+
+if _2h then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 120);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 120);
+	Plot7 (BarsSinceDiv, "2H", BLACK, Color);
+end;
+
+if _4h then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 1, 240);	
+	Color = $MM_MTFGetNum("KVD_Color", 1, 240);
+	Plot8(BarsSinceDiv, "4H", BLACK, Color);
+end;
+
+if _D then 
+begin
+	BarsSinceDiv = $MM_MTFGetNum("KVD_BarsSinceDiv", 2, 0);	
+	Color = $MM_MTFGetNum("KVD_Color", 2, 0);
+	Plot9 (BarsSinceDiv, "D", BLACK, Color);
+end;	
+
+//This is needed to enforce "History" - which makes the reader updated in real time. 
+Value1 = High - High[1];
+
+
+
+
+
+
+
+
+
+
+
+

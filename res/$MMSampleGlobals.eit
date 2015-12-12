@@ -1,0 +1,116 @@
+{
+	$MMSampleGlobals -- A simple, sample trend indicator demonstrating how to use 
+						the MultiMarkets Multi-TimeFrame Engine. 
+	                    If the indicator displays Green, 
+	                    the time frame is in an uptrend (price above moving average. 
+	                    If the indicator displays Red, 
+	                    the time frame is in a downtrend (price below moving average. 
+	                    
+	                    When you receive the MFT indicator package. If the $MMSamplesGlobal Indicator included
+	                    is protected, that is you can't see the source code, simply delete it and recreate it
+	                    using this file. Then you can follow this code to learn how to create your own 
+	                    multi-time frame indicators. 
+	                    
+						See www.multimarketstrading.com for more information. 
+}
+
+inputs: 
+		SetGetGlobals_1_2(1); 
+		
+variables:  
+{
+	IDStr is the root unique MTF ID for this set of data. 
+	You can use one or several of these IDs in an indicator, depending on need. 
+} 
+	IDStr("MMSampleGlobals"), Avg(0), Color(0), RC(false), Dir(""); 
+
+{
+	1. Add this indicator to an "engine" radarscreen, and set up multiple rows for each symbol desired, 
+   	designating for each symbol a monthly, weekly, daily, 120 minute, 15 minute, 5 minute and 89 ticks row. 
+ 	
+	2. Click header of indicator in RadarScreen and select "Format 'MMSampleGlobals' for All Symbols..."
+   	Click input and set SetGetGlobals_1_2 to 1. 
+	
+	3. Click "General" and check "Load additional bars for accumlative calculations." Set the number of bars to
+   	the size of the second parameter of the XAverage or larger. (The indicator will produce no data if there 
+   	are not enough bars load to do the moving average calcuation. This is true for any RadarScreen 
+   	indicator which does any kind of accumlative calculation.)
+} 
+If (SetGetGlobals_1_2 = 1) Then 	
+	Begin 			
+	Avg = XAverage(Close, 21);
+
+	// Determine if price is above or below the moving average. 
+	If (Close > Avg) Then 
+		Color = DarkGreen
+	Else 
+	If (Close < Avg) Then  
+		Color = DarkRed 
+	Else 
+		Color = Color[1];
+		
+	// Note: The MTF and RadarScreen is designed to work with end of chart data. In facts, the set 
+	// functions do nothing if called before LastBarOnChart.  
+	If (LastBarOnChart) Then
+		{ 
+		Call $MM_MTFSetNum to store numeric data. (Call $MM_MTFSetStr to store string data.) 
+		MTF will store the data based on IDStr, time frame, and the fact it is numeric or string. 
+		In this case, Color is the numeric item being stored. The set functions require a boolean 
+		return code (RC) which is always true. 
+		}
+		RC = $MM_MTFSetNum(IDStr, Color); 
+	End 
+
+{
+4. Add this indicator to a separate "display" RadarScreen. Add same symbols (for any timeframe) 
+   as were added to the engine RadarScreen. 
+
+5. Click header of indicator in RadarScreen and select "Format 'MMSampleGlobals' for All Symbols..."
+   Click input and set SetGetGlobals_1_2 to 2. 
+   
+6. Indicator in display RadarScreen will display information based on data from engine RadarScreen. 
+} 
+
+Else 
+If (SetGetGlobals_1_2 = 2 AND LastBarOnChart) Then 
+	Begin 
+	{
+	To retrieve the Global data, pass the IDString defined above and the BarType and BarInterval you want back. 
+	
+		e.g.: NumVal = $MM_MTFGetNum(IDstr, BT, BI); 
+		      StrVal = $MM_MTFGetStr(IDstr, BT, BI); 
+		
+	Do not pass the reserved words BarType and BarInterval, 
+	but rather pass the literal values of those which were in effect when in the Set phase.
+	BarType values are 4=Monthly, 3=Weekly, 2=Daily, 1=Minute, 0=Tick. 
+	For minutes or ticks the third parameter (BI) is the number of minutes or ticks. 
+	Note: second or volume data is not supported. 
+	
+	The Get phase plots the data on the "display" RadarScreen, note it's up to the programmer to match
+	the proper data with the appropriate plot label. 
+	}										
+	Color = $MM_MTFGetNum(IDStr, 4, 0);		
+	SetPlotBGColor(1, Color);
+	Plot1(Dir, "M", Color);
+
+	Color  = $MM_MTFGetNum(IDStr, 3, 0);		
+	SetPlotBGColor(2, Color); 				
+	Plot2(Dir, "W", Color);
+	
+	Color   = $MM_MTFGetNum(IDStr, 2, 0);		
+	SetPlotBGColor(3, Color); 				
+	Plot3(Dir, "D", Color);
+							
+	Color   = $MM_MTFGetNum(IDStr, 1, 30);		
+	SetPlotBGColor(5, Color); 			
+	Plot5(Dir, "30m", Color);
+
+	Color   = $MM_MTFGetNum(IDStr, 1, 5);		
+	SetPlotBGColor(6, Color); 
+	Plot6(Dir, "5m", Color);
+
+	Color  = $MM_MTFGetNum(IDStr, 0, 89);		
+	SetPlotBGColor(7, Color); 
+	Plot7(Dir, "89t", Color);
+		
+	End;

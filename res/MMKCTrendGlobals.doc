@@ -1,0 +1,67 @@
+MultiMarkets Indicators – Risk Disclaimer
+
+By using any portion of Gary Bourque’s MultiMarkets Trading Indicators or any information from his services, you agree to the Terms and Conditions governing the use of the services and products as described in this disclaimer. Our disclaimers, policies and terms are subject to change without notice.
+
+You understand the financial implications and risks of trading stocks, options, futures and Forex. You have sufficient liquid funds to invest.
+
+Under no circumstances, including, but not limited to, negligence, shall Gary Bourque or MultiMarkets Trading be liable for any special or consequential damages that result from the use of or the inability to use, the products, services and information provided by them. Nothing Gary Bourque or MultiMarkets Trading offers or sells should be construed as a recommendation to buy and/or sell any stocks, options, futures, or Forex instrument. You agree that Gary Bourque and MultiMarkets Trading will not responsible for your personal trading results. No representation is being made that any account will or is likely to achieve profits or losses similar to those discussed on this website.
+
+There is significant risk of loss trading stocks, futures, options and Forex.  Trading may not be suitable for everyone and you should carefully consider the risks in light of your financial condition in deciding whether to trade commodity futures and options. Further, You assume the entire cost, lost and/or risk of any trading you choose to undertake. All funds committed should be purely risk capital. You may sustain a total loss of the initial margin funds and any additional funds that you deposit in your account to establish or maintain a position in the commodity futures and options market. You should realize that when trading futures and/or granting/writing options you could lose the full balance of your account. It is also possible to lose more than the initial deposit when trading futures and/or granting/writing options. Under no circumstances, including, but not limited to, negligence, shall this service be liable for any special or consequential damages that result from the use of or the inability to use, the materials provided by this service.
+
+Questions? support@multimarketstrading.com or visit www.multimarketstrading.com
+
+
+
+
+$MMKCTrendGlobals
+
+MultiMarkets Keltner Channel Trend Globals Indicator
+Show trends according to Keltner Channel crossover algorithm. Green up, red down. Minimizes false signals. Posts values from an engine RadarScreen copy of the indicator to be picked up by one or more display RadarScreen copies. 
+
+1. Input the .ELD files into TradeStation, the MTF Engine is in both .ELD files, so there may be overwrite warnings. Don't worry about these. 
+
+2. Add indicator to single engine RadarScreen. 
+
+3. Right click header of indicator in engine RadarScreen. Click "Format "$MMKCTrendGlobals for all symbols." then "General." 
+Set "Maximum number of bars studies will reference:" to "Auto detect."  
+Check "Load additional data for accumulative calculations." 
+Set "Additional bars to load:" to 100. 
+
+4. In "Format "$MMKCTrendGlobals for all symbols," go to "Input." 
+Set SetGetGlobals_1_2 to 1. This tells the indicator to track the data and post to Global Dictionary. 
+Set the other inputs as desired to track trend:
+Price    - How price is calculated. Usually Close, but can be something like (High+Low+Close)/3.
+
+MALength - The length of the KeltnerChannel moving average. Trend changes more often on shorter period. 
+
+NumColors - Determines the color delineation of bars. 
+Blue         = Neutral. Price closes on other side of moving average length from last trend. 
+Green        = Up trend 
+Bright green = Extended up trend. 
+Red          = Down trend 
+Bright red   = Extended down trend. 
+If = 2, green and red will be plotted. 
+If = 3, blue green and red. 
+If = 5, blue, green, bright green, red and bright red.
+
+NumATRs1  - The number of ATRS distance above and below the moving average the first level of Keltner lines will be plotted. Widens or narrows the channel. Trend changes faster on narrower channel, but also produces more false signals. 
+
+NumATRs2  - The number of ATRS distance above and below the moving average the second level of Keltner lines will be plotted. Should be larger than NumATRS1. Widens or narrows the channel. Trend changes faster on narrower channel, but also produces more false signals. 
+
+
+5. In the engine RadarScreen add each symbol you want to track with a row for each time frame you want to track. Valid time frames are:  monthly, weekly, daily, 240 minute, 120 minute, 60 minute, 30 minute, 15 minute, 10 minute, 5 minute, 2 minute, 1 minute, 1000 tick, 500 tick, 250 tick and 100 tick. 
+
+6. Add the indicator to a different, display RadarScreen. Set SetGetGlobals_1_2 to 2. This tells the indicator to fetch the data from the Global Dictionary and display the results. 
+The other inputs have no effect on the display side. 
+
+7. Add the symbols you want to track. Any time frame is okay, the indicators does not usethe time frame of the display row. Right click the indicator and Show/Hide the plots as desired. Size the display boxes for easy reading. 
+
+8. If some boxes are black, it is okay to refresh the display RadarScreen, but it's not a good idea to refresh the engine RadarScreen. A TradeStation bug can cause a crash when this is done. If boxes remain black, sometimes it may take time for the bars to load on the engine side, or the timeframe row may be missing. Be sure the indicator is loading enough bars on the engine side to be effective. 
+
+9. Displayed colors contained hidden ranking characters, allowing columns to be sorted. 
+
+10. ALWAYS SAVE BACKUPS OF YOUR WORKSPACES. TRADESTATION BUGS CAN CAUSE CRASHES AND SOMETIMES DELETE RADARSCREENS.  
+
+11. See various posts, videos and other information on www.multimarketstrading.com. 
+
+Questions? support@multimarketstrading.com or visit our website.

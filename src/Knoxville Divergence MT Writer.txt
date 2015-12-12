@@ -1,0 +1,238 @@
+
+//+------------------------------------------------------------------+
+//|                                        Knoxville Divergence1.31  |
+//|                                                        D. Sinnig |      
+//|																	 |
+//| v1.31:                                                           |
+//| - Optimized Indicator for RadarScreen 							 |
+//|																	 |
+//| v1.3:                                                            |
+//| - Write bar since divergence value and color to the global       |		
+//|   dictionary													 |
+//|																	 |
+//| v1.2:                                                            |
+//| - Plot out bars since last divergence instead of offset from     |
+//|   Pivot point													 |
+//|																	 |
+//| v1.1:                                                            |
+//| - added PlotStatements for RadarScreen                           |
+//|                                                                  |
+//| v1.0:                                                            |
+//| - initial version                                                |
+//+------------------------------------------------------------------+
+
+// Configuration:
+// - Set "Maximum number of bars study will reference to the value of "LookBackbars" - or 
+// - Deactivate "Update value intra-bar (tick-by-tick)"
+// - Check "Load additional data for accumulative calculations"
+// - Set value to 4*of the LookbackBars value (or higher) (e.g.  600) 
+
+
+
+Inputs:
+	LookbackBars(150),
+	RSI_Length(21),
+	Momentum_Length(20),
+	PivotStrength(2),
+	OB(70),
+	OS(30);
+	
+Vars:
+	//needed for multi time frame engine
+	RC(false),
+	Color(Lightgray),
+	BarsSinceDiv(-1),
+	//needed for knoxville indicator
+	BarsSinceSellDiv(0),
+	BarsSinceBuyDiv(0),
+	Mom(0),
+	RSI_Value(0),
+	NumPivotHighs(0),
+	NumPivotLows(0),
+	Ret(0),
+	x(0),
+	y(0),
+	Offset(0),
+	SellDivFound(false),
+	NewSellDiv(false),
+	BuyDivFound(false),
+	NewBuyDiv(false);
+	
+Arrays:
+	PivotHighs[100](0),
+	PivotHighBars[100](0),
+	PivotLows[100](0),
+	PivotLowBars[100](0),
+	
+	HighRefNums[200](-99),
+	LowRefNums[200](-99),  
+	
+	HighStartBars[200](0),
+	LowStartBars[200](0); 
+	
+	
+
+
+/////////////////////////////////////////
+
+// If more than one bar is equal to the high/low pivot, use the oldest one
+method int FindBarOfHighPivot()
+begin
+	Ret = Barnumber[PivotStrength];	 
+	x   = PivotStrength + 1;
+	
+	while high[PivotStrength] = high[x]
+	begin
+		Ret = Barnumber[x];
+		x   = x + 1;		
+	end;		
+	
+	Return Ret;
+end;
+
+method int FindBarOfLowPivot()
+begin
+	Ret = Barnumber[PivotStrength];
+	x   = PivotStrength + 1;
+	
+	while low[PivotStrength] = low[x]
+	begin
+		Ret = Barnumber[x];
+		x   = x + 1;		
+	end;		
+		
+	Return Ret;
+end;
+
+//once cleardebug;
+
+/////////////////////////////////////
+
+RSI_Value = RSI(close,RSI_Length);
+Mom       = Momentum(close,Momentum_Length);
+	
+// Remove old pivots
+while NumPivotHighs <> 0 and Barnumber - PivotHighBars[NumPivotHighs] > LookbackBars
+begin
+	NumPivotHighs = NumPivotHighs -1;
+end;
+	
+while NumPivotLows <> 0 and Barnumber - PivotLowBars[NumPivotLows] > LookbackBars
+begin
+	NumPivotLows = NumPivotLows -1;
+end;
+	
+///////////////////////////////////////////
+
+if Barnumber > 5 and SO_SwingHighBar(1,high,PivotStrength,PivotStrength,3 * PivotStrength) = PivotStrength then 
+begin
+	NumPivotHighs    = NumPivotHighs + 1;
+	PivotHighs[0]    = high[PivotStrength];
+	PivotHighBars[0] = FindBarOfHighPivot();
+	
+	for x = NumPivotHighs downto 1
+	begin
+		PivotHighs[x]    = PivotHighs[x-1];
+		PivotHighBars[x] = PivotHighBars[x-1];		
+	end;
+end;	
+
+if Barnumber > 5 and SO_SwingLowBar(1,Low,PivotStrength,PivotStrength,3 * PivotStrength) = PivotStrength then 
+begin
+	NumPivotLows    = NumPivotLows + 1;
+	PivotLows[0]    = Low[PivotStrength];
+	PivotLowBars[0] = FindBarOfLowPivot();
+	
+	for x = NumPivotLows downto 1
+	begin
+		PivotLows[x]    = PivotLows[x-1];
+		PivotLowBars[x] = PivotLowBars[x-1];		
+	end;
+end;
+
+//////////////////////////////////////////////////////////////////
+
+// Look for a sell divergence
+// This high is higher than an earlier High Pivot
+// The Mom value at that previous lower high is higher than the current Mom
+// There was an RSI between these 2 highs that was overbought
+for x = 1 to NumPivotHighs
+begin
+	Offset = barnumber - PivotHighBars[x];
+	SellDivFound = false;
+	if high > PivotHighs[x] and Mom < Mom[Offset] and high > highest(high,Offset)[1] then
+	begin	// Higher high, lower momentum, look for intervening OB RSI
+		y  = 0;
+		while y <= Offset and SellDivFound = false
+		begin
+			if RSI_Value[y] > OB then SellDivFound = true;
+			y = y + 1;
+		end;
+	end;	
+	
+	if SellDivFound then break;
+	
+end;
+
+////////////////////////
+
+
+// Look for a Buy divergence
+// This low is lower than an earlier Low Pivot and must be the lowest low between itself and the highr pivot
+// The Mom value at that previous higher low is lower than the current Mom
+// There was an RSI between these 2 lows that was oversold
+for x = 1 to NumPivotLows
+begin
+	Offset = barnumber - PivotLowBars[x];
+	BuyDivFound = false;
+
+	if low < PivotLows[x] and Mom > Mom[Offset] and low < lowest(low,Offset)[1] then
+	begin	// Lower Low, Higher momentum, look for intervening OS RSI   
+		y  = 0;
+		while y <= Offset and BuyDivFound = false
+		begin
+			if RSI_Value[y] < OS then BuyDivFound = true;
+			y = y + 1;
+		end;
+	end;	
+	
+	if BuyDivFound then break;
+end;
+
+If SellDivFound = True then BarsSinceSellDiv = 0;
+If BuyDivFound = True then BarsSinceBuyDiv = 0;
+
+If SellDivFound = False then BarsSinceSellDiv = BarsSinceSellDiv + 1;
+If BuyDivFound = False then BarsSinceBuyDiv = BarsSinceBuyDiv + 1;
+
+//Print (Date, " ", Time, " " ,symbol, ": ", Barinterval, " ", BarsSinceSellDiv, " ", BarsSinceBuyDiv);
+
+
+if BarsSinceSellDiv < BarsSinceBuyDiv then  
+begin
+	Color = RED; 
+	BarsSinceDiv = BarsSinceSellDiv;
+end; 
+
+If BarsSinceBuyDiv < BarsSinceSellDiv then
+Begin
+	Color = GREEN;
+	BarsSinceDiv = BarsSinceBuyDiv;
+end;
+
+//Write BarSinceDivergence and Color to Global Dictionary
+
+If (LastBarOnChart) Then 
+Begin
+	RC = $MM_MTFSetNum("KVD_BarsSinceDiv", BarsSinceDiv);
+	RC = $MM_MTFSetNum("KVD_Color", Color);
+End;
+
+//Plot out value in color. 
+Plot1 (BarsSinceDiv, "KD", BLACK, Color);
+
+
+
+	
+
+		
